@@ -1,1 +1,3 @@
 sources/*.o
+sources/test
+.vscode
