@@ -1,6 +1,7 @@
 # VERSION = 1.1.1
 VERSION=$(shell ../version_engine/version.sh | head -n 1 )
 
+EXECUTABLE = test
 # # Library name
 LIB_NAME = utjson
 # # Install path
@@ -43,4 +44,9 @@ copy:
 	/bin/mkdir -p $(INSTALL_PATH)lib
 	cp -f $(TARGET_LIB) $(INSTALL_PATH)lib/
 	cp -f $(STATIC_LIB) $(INSTALL_PATH)lib/
+
+.PHONY: test
+$(EXECUTABLE): $(OBJECTS)
+	@$(CC) -o ${EXECUTABLE} $(OBJECTS) ${L_FLAGS} $(S_LIBS) $(D_LIBS)
+
 
