@@ -1,4 +1,5 @@
 #include "utjson.h"
+#include <ctype.h>
 #include <errno.h>
 #include <sys/time.h>
 #include <syslog.h>
@@ -19,7 +20,7 @@ char *utjson_version(void)
  * @param object
  * @return utjson*
  */
-static utjson *utjson_destruct(utjson *object)
+utjson *utjson_destruct(utjson *object)
 {
     switch (object->type)
     {
@@ -32,7 +33,6 @@ static utjson *utjson_destruct(utjson *object)
                 object->children[idx] = utjson_destruct(object->children[idx]);
             }
         }
-        FREE_AND_NULL(object->children);
         break;
     case utjson_OBJECT:
         // destuct all children of object
@@ -51,9 +51,12 @@ static utjson *utjson_destruct(utjson *object)
             }
         }
         break;
+    default:
+        break;
     }
     FREE_AND_NULL(object->string);
     FREE_AND_NULL(object->name);
+    FREE_AND_NULL(object->children);
     FREE_AND_NULL(object);
 
     return NULL;
@@ -148,6 +151,7 @@ utjson *utjson_createObject(void)
     if (object)
     {
         object->type = utjson_OBJECT;
+        object->children = calloc(1, sizeof(utjson *));
     }
     return object;
 }
@@ -266,6 +270,7 @@ utjson *utjson_set(utjson *target, char *name, utjson *object)
         }
         if (object)
         {
+            object->name = strdup(name);
             utjson *replaced = NULL;
             HASH_REPLACE_STR(*(target->children), name, object, replaced);
             if (replaced)
@@ -392,33 +397,19 @@ utjson *utjson_add(utjson *target, utjson *object)
 {
     if (utjson_IS(ARRAY, target))
     {
-        bool created = false;
         if (!object)
         {
             object = utjson_createNull();
-            created = true;
         }
         if (object)
         {
-            if (object->allocated <= object->used)
+            if (target->allocated <= target->used)
             {
-                uint16_t resized = object->allocated + utjson_ARRAY_INCREMENT;
-                object->children = realloc(object->children, resized * sizeof(struct utjson *));
-                object->allocated = object->children ? resized : 0;
+                target->allocated += utjson_ARRAY_INCREMENT;
+                target->children = realloc(target->children, target->allocated * sizeof(struct utjson *));
             }
-            if (object->used < object->allocated)
-            {
-                object->children[object->used] = object;
-                object->used++;
-            }
-            else if (created)
-            {
-                FREE_AND_NULL(object);
-            }
-            else
-            {
-                return NULL;
-            }
+            target->children[target->used++] = object;
+            object->parent = target;
             return object;
         }
         else
@@ -564,4 +555,240 @@ utjson *utjson_select(utjson *array, uint16_t index)
     }
     errno = EINVAL;
     return NULL;
+}
+
+static char *skip_whitespace(char *c)
+{
+    while (*c && isspace((unsigned char)*c))
+        c++;
+    return c;
+}
+
+static utjson *parse_value(char **source);
+
+static utjson *parse_null(char **source)
+{
+    if (strncmp(*source, "null", 4) == 0)
+    {
+        *source += 4;
+        return utjson_createNull();
+    }
+    return NULL;
+}
+
+static utjson *parse_bool(char **source)
+{
+    if (strncmp(*source, "true", 4) == 0)
+    {
+        *source += 4;
+        return utjson_createBool(true);
+    }
+    else if (strncmp(*source, "false", 5) == 0)
+    {
+        *source += 5;
+        return utjson_createBool(false);
+    }
+    return NULL;
+}
+
+static utjson *parse_number(char **source)
+{
+    char *end;
+    double value = strtod(*source, &end);
+    if (end == *source)
+        return NULL; // No valid number
+    *source = end;
+    return utjson_createNumber(value);
+}
+
+static utjson *parse_string(char **source)
+{
+    if (**source != '"')
+        return NULL;
+    (*source)++;
+    char *start = *source;
+    while (**source && **source != '"')
+        (*source)++;
+    if (**source != '"')
+        return NULL; // Unterminated string
+    size_t len = *source - start;
+    char *value = strndup(start, len);
+    (*source)++;
+    utjson *str_obj = utjson_createString(value);
+    free(value);
+    return str_obj;
+}
+
+static utjson *parse_array(char **source)
+{
+    if (**source != '[')
+        return NULL;
+    (*source)++;
+    utjson *array = utjson_createArray();
+
+    while (**source && **source != ']')
+    {
+        *source = skip_whitespace(*source);
+        utjson *element = parse_value(source);
+        if (!element)
+        {
+            utjson_destruct(array);
+            return NULL;
+        }
+
+        utjson_add(array, element);
+
+        *source = skip_whitespace(*source);
+        if (**source == ',')
+        {
+            (*source)++;
+        }
+    }
+    if (**source == ']')
+        (*source)++;
+    return array;
+}
+
+static utjson *parse_object(char **source)
+{
+    if (**source != '{')
+        return NULL;
+    (*source)++;
+    utjson *object = utjson_createObject();
+
+    while (**source && **source != '}')
+    {
+        *source = skip_whitespace(*source);
+        utjson *key = parse_string(source);
+        if (!key)
+        {
+            utjson_destruct(object);
+            return NULL;
+        }
+
+        *source = skip_whitespace(*source);
+        if (**source != ':')
+        {
+            utjson_destruct(object);
+            utjson_destruct(key);
+            return NULL;
+        }
+        (*source)++;
+
+        *source = skip_whitespace(*source);
+        utjson *value = parse_value(source);
+        if (!value)
+        {
+            utjson_destruct(object);
+            utjson_destruct(key);
+            return NULL;
+        }
+
+        utjson_set(object, key->string, value);
+        utjson_destruct(key);
+
+        *source = skip_whitespace(*source);
+        if (**source == ',')
+        {
+            (*source)++;
+        }
+    }
+    if (**source == '}')
+        (*source)++;
+    return object;
+}
+
+static utjson *parse_value(char **source)
+{
+    *source = skip_whitespace(*source);
+    if (**source == 'n')
+        return parse_null(source);
+    if (**source == 't' || **source == 'f')
+        return parse_bool(source);
+    if (**source == '"')
+        return parse_string(source);
+    if ((**source == '-' || isdigit((unsigned char)**source)))
+        return parse_number(source);
+    if (**source == '[')
+        return parse_array(source);
+    if (**source == '{')
+        return parse_object(source);
+    return NULL;
+}
+
+utjson *utjson_parse(char *source)
+{
+    if (!source)
+        return NULL;
+    char *ptr = source;
+    return parse_value(&ptr);
+}
+
+static void append_str(char **dest, const char *format, ...)
+{
+    va_list args;
+    char *temp;
+    va_start(args, format);
+    vasprintf(&temp, format, args);
+    va_end(args);
+
+    size_t len = (*dest ? strlen(*dest) : 0) + strlen(temp) + 1;
+    *dest = realloc(*dest, len);
+    strcat(*dest, temp);
+    free(temp);
+}
+
+char *utjson_print(utjson *object, bool readable)
+{
+    if (!object)
+        return strdup("null");
+    char *output = strdup("");
+
+    switch (object->type)
+    {
+    case utjson_NULL:
+        append_str(&output, "null");
+        break;
+    case utjson_BOOL:
+        append_str(&output, object->number ? "true" : "false");
+        break;
+    case utjson_NUMBER:
+        append_str(&output, "%g", object->number);
+        break;
+    case utjson_STRING:
+        append_str(&output, "\"%s\"", object->string);
+        break;
+    case utjson_ARRAY:
+        append_str(&output, "[");
+        for (uint16_t i = 0; i < object->used; i++)
+        {
+            if (i > 0)
+                append_str(&output, ",%s", readable ? " " : "");
+            char *item_str = utjson_print(object->children[i], readable);
+            append_str(&output, "%s", item_str);
+            free(item_str);
+        }
+        append_str(&output, "]");
+        break;
+    case utjson_OBJECT:
+        append_str(&output, "{");
+        utjson *entry, *tmp;
+        HASH_ITER(hh, *(object->children), entry, tmp)
+        {
+            append_str(&output, "\"%s\":%s", entry->name, readable ? " " : "");
+            char *value_str = utjson_print(entry, readable);
+            append_str(&output, "%s,", value_str);
+            free(value_str);
+        }
+        if (output[strlen(output) - 1] == ',')
+        {
+            output[strlen(output) - 1] = '}';
+        }
+        else
+        {
+            append_str(&output, "}");
+        }
+        break;
+    }
+    return output;
 }

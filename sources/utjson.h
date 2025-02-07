@@ -4,6 +4,7 @@
 #define _GNU_SOURCE
 
 #include "uthash.h"
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -19,13 +20,26 @@
         free(x);         \
     x = NULL
 
+typedef enum
+{
+    utjson_NULL,
+    utjson_BOOL,
+    utjson_NUMBER,
+    utjson_STRING,
+    utjson_ARRAY,
+    utjson_OBJECT
+} utjson_type;
+#define utjson_IS(TYPE, object) (object && utjson_##TYPE == (object)->type)
+
+#define utjson_ARRAY_INCREMENT 16
+
 typedef struct utjson
 {
     char *name;
     UT_hash_handle hh; /* makes this structure hashable */
     struct utjson *parent;
     //
-    uint32_t type;
+    utjson_type type;
     double number;
     char *string;
     //
@@ -36,17 +50,8 @@ typedef struct utjson
 
 char *utjson_version(void);
 
-#define utjson_NULL 0
-#define utjson_BOOL 1
-#define utjson_NUMBER 2
-#define utjson_STRING 3
-#define utjson_ARRAY 4
-#define utjson_OBJECT 5
-#define utjson_IS(TYPE, object) (object && utjson_##TYPE == (object)->type)
-
-#define utjson_ARRAY_INCREMENT 16
-
 #define utjson_construct() calloc(1, sizeof(struct utjson))
+utjson *utjson_destruct(utjson *object);
 
 utjson *utjson_createNull(void);
 utjson *utjson_createBool(bool value);
@@ -77,6 +82,9 @@ utjson *utjson_addNumber(utjson *target, double value);
 utjson *utjson_addString(utjson *target, char *value);
 utjson *utjson_addArray(utjson *target);
 utjson *utjson_addObject(utjson *target);
+
+utjson *utjson_parse(char *source);
+char *utjson_print(utjson *object, bool readable);
 
 #define utjson_arrayFor(array, item, index) \
     if (utjson_IS(ARRAY, array))            \
