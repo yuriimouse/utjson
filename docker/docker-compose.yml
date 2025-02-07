@@ -1,0 +1,14 @@
+networks:
+  app-tier:
+    driver: bridge
+services:
+  utjson:
+    container_name: utjson
+    build: .
+    volumes:
+      - ../:/utjson
+    networks:
+      - app-tier
+    entrypoint: /bin/bash
+    stdin_open: true
+    tty: true
