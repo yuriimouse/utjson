@@ -25,12 +25,13 @@
  */
 typedef enum
 {
-    utjson_NULL,   /**< Null value */
-    utjson_BOOL,   /**< Boolean value */
-    utjson_NUMBER, /**< Numeric value */
-    utjson_STRING, /**< String value */
-    utjson_ARRAY,  /**< Array of JSON values */
-    utjson_OBJECT  /**< JSON object with key-value pairs */
+    utjson_NULL,    /**< Null value */
+    utjson_BOOL,    /**< Boolean value */
+    utjson_NUMBER,  /**< Numeric value */
+    utjson_STRING,  /**< String value */
+    utjson_ARRAY,   /**< Array of JSON values */
+    utjson_OBJECT,  /**< JSON object with key-value pairs */
+    utjson_POINTER, /**< Universal pointer type */
 } utjson_type;
 #define utjson_IS(TYPE, object) (object && utjson_##TYPE == (object)->type)
 
@@ -47,6 +48,8 @@ typedef struct utjson
     utjson_type type;         /**< Type of the JSON value */
     double number;            /**< Numeric value (if type == utjson_NUMBER) */
     char *string;             /**< String value (if type == utjson_STRING) */
+    void *pointer;            /**< Generic pointer storage */
+    char *pointer_type;       /**< String describing the pointer type */
     uint16_t allocated;       /**< Number of allocated child elements (arrays/objects) */
     uint16_t used;            /**< Number of used child elements (arrays/objects) */
     struct utjson **children; /**< Array of child elements (for arrays and objects) */
@@ -98,6 +101,11 @@ utjson *utjson_createArray(void);
  * @return Pointer to a new utjson object of type utjson_OBJECT.
  */
 utjson *utjson_createObject(void);
+/**
+ * @brief Creates a JSON object representing a pointer.
+ * @return A utjson object of type utjson_POINTER.
+ */
+utjson *utjson_createPointer(void *ptr, const char *type);
 
 /**
  * @brief Retrieves a boolean value from a JSON object.
@@ -119,6 +127,12 @@ double utjson_asNumber(utjson *object);
  * @return Pointer to the string stored in the object.
  */
 char *utjson_asString(utjson *object);
+
+/**
+ * @brief Retrieves a pointer value and its type from a JSON object.
+ * @return The stored pointer, or NULL if invalid.
+ */
+void *utjson_asPointer(utjson *object, char **pointer_type);
 
 /**
  * @brief Retrieves a value from a JSON object by key.

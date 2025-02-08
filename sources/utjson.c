@@ -56,6 +56,7 @@ utjson *utjson_destruct(utjson *object)
     }
     FREE_AND_NULL(object->string);
     FREE_AND_NULL(object->name);
+    FREE_AND_NULL(object->pointer_type);
     FREE_AND_NULL(object->children);
     FREE_AND_NULL(object);
 
@@ -157,6 +158,24 @@ utjson *utjson_createObject(void)
 }
 
 /**
+ * Creates a JSON object representing a pointer.
+ *
+ * @param ptr The pointer to store.
+ * @param type A string describing the pointer type.
+ * @return A utjson object of type utjson_POINTER.
+ */
+utjson *utjson_createPointer(void *ptr, const char *type)
+{
+    if (!type)
+        return NULL;
+    utjson *object = utjson_construct();
+    object->type = utjson_POINTER;
+    object->pointer = ptr;
+    object->pointer_type = strdup(type);
+    return object;
+}
+
+/**
  * Converts value to boolean
  *
  * @param object
@@ -168,6 +187,8 @@ bool utjson_asBool(utjson *object)
     {
         switch (object->type)
         {
+        case utjson_POINTER:
+            // fall through
         case utjson_NULL:
             return false;
         case utjson_BOOL:
@@ -198,6 +219,8 @@ double utjson_asNumber(utjson *object)
     {
         switch (object->type)
         {
+        case utjson_POINTER:
+            // fall through
         case utjson_NULL:
             return 0;
         case utjson_BOOL:
@@ -228,6 +251,8 @@ char *utjson_asString(utjson *object)
     {
         switch (object->type)
         {
+        case utjson_POINTER:
+            // fall through
         case utjson_NULL:
             return NULL;
         case utjson_BOOL:
@@ -248,6 +273,22 @@ char *utjson_asString(utjson *object)
     }
     errno = EINVAL;
     return NULL;
+}
+
+/**
+ * Retrieves a pointer value and its type from a JSON object.
+ *
+ * @param object The JSON object.
+ * @param pointer_type A pointer to a string where the type will be stored.
+ * @return The stored pointer, or NULL if invalid.
+ */
+void *utjson_asPointer(utjson *object, char **pointer_type)
+{
+    if (pointer_type)
+    {
+        *pointer_type = pointer_type && object ? object->pointer_type : NULL;
+    }
+    return utjson_IS(POINTER, object) ? object->pointer : NULL;
 }
 
 /**
@@ -614,6 +655,22 @@ static utjson *parse_string(char **source)
     size_t len = *source - start;
     char *value = strndup(start, len);
     (*source)++;
+
+    // Check if the string follows the pointer format "<:type:>pointer"
+    if (strncmp(value, "<:", 2) == 0)
+    {
+        char *end = strstr(value, ":>pointer");
+        if (end)
+        {
+            size_t type_len = end - (value + 2);
+            char *type = strndup(value + 2, type_len);
+            utjson *pointer_obj = utjson_createPointer(NULL, type);
+            free(type);
+            free(value);
+            return pointer_obj;
+        }
+    }
+
     utjson *str_obj = utjson_createString(value);
     free(value);
     return str_obj;
@@ -801,6 +858,9 @@ char *utjson_print(utjson *object, bool readable)
         {
             append_str(&output, "}");
         }
+        break;
+    case utjson_POINTER:
+        asprintf(&output, "\"<:%s:>pointer\"", object->pointer_type);
         break;
     }
     return output;
