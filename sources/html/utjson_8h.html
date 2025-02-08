@@ -138,7 +138,9 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="group__types.html#ga1ca98d67f62e7feb99069da91df062b0a83d0661a184610e58fa524113bc34d2c">utjson_NUMBER</a>, 
 <a class="el" href="group__types.html#ga1ca98d67f62e7feb99069da91df062b0ab3ad17c4a26a717c2b988fd457afa623">utjson_STRING</a>, 
 <a class="el" href="group__types.html#ga1ca98d67f62e7feb99069da91df062b0ab03438274f6ba04b923e993c1deeff0d">utjson_ARRAY</a>, 
-<a class="el" href="group__types.html#ga1ca98d67f62e7feb99069da91df062b0a34837d65bab94365e9bb7662b434f80c">utjson_OBJECT</a>
+<a class="el" href="group__types.html#ga1ca98d67f62e7feb99069da91df062b0a34837d65bab94365e9bb7662b434f80c">utjson_OBJECT</a>, 
+<br />
+&#160;&#160;<a class="el" href="group__types.html#ga1ca98d67f62e7feb99069da91df062b0a86fe727c05dcf62e89a2390964fca8a8">utjson_POINTER</a>
 <br />
  }</td></tr>
 <tr class="memdesc:a1ca98d67f62e7feb99069da91df062b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">JSON value types.  <a href="utjson_8h.html#a1ca98d67f62e7feb99069da91df062b0">More...</a><br /></td></tr>
@@ -169,6 +171,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga7c045dca14b1c2dbb656341507c8cda5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structutjson.html">utjson</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__functions.html#ga7c045dca14b1c2dbb656341507c8cda5">utjson_createObject</a> (void)</td></tr>
 <tr class="memdesc:ga7c045dca14b1c2dbb656341507c8cda5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new JSON object.  <a href="group__functions.html#ga7c045dca14b1c2dbb656341507c8cda5">More...</a><br /></td></tr>
 <tr class="separator:ga7c045dca14b1c2dbb656341507c8cda5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6faf82bb9a66cdd2785d919d7c5abe77"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structutjson.html">utjson</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utjson_8h.html#a6faf82bb9a66cdd2785d919d7c5abe77">utjson_createPointer</a> (void *ptr, const char *type)</td></tr>
+<tr class="memdesc:a6faf82bb9a66cdd2785d919d7c5abe77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a JSON object representing a pointer.  <a href="#a6faf82bb9a66cdd2785d919d7c5abe77">More...</a><br /></td></tr>
+<tr class="separator:a6faf82bb9a66cdd2785d919d7c5abe77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acda7b577645ad52442702980ecf64704"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utjson_8h.html#acda7b577645ad52442702980ecf64704">utjson_asBool</a> (<a class="el" href="structutjson.html">utjson</a> *object)</td></tr>
 <tr class="memdesc:acda7b577645ad52442702980ecf64704"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves a boolean value from a JSON object.  <a href="#acda7b577645ad52442702980ecf64704">More...</a><br /></td></tr>
 <tr class="separator:acda7b577645ad52442702980ecf64704"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -178,6 +183,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a97375f4b12f381fd59346278de687fa8"><td class="memItemLeft" align="right" valign="top">char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utjson_8h.html#a97375f4b12f381fd59346278de687fa8">utjson_asString</a> (<a class="el" href="structutjson.html">utjson</a> *object)</td></tr>
 <tr class="memdesc:a97375f4b12f381fd59346278de687fa8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves a string value from a JSON object.  <a href="#a97375f4b12f381fd59346278de687fa8">More...</a><br /></td></tr>
 <tr class="separator:a97375f4b12f381fd59346278de687fa8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7248e5303c528422183c3e245aaac9d8"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="utjson_8h.html#a7248e5303c528422183c3e245aaac9d8">utjson_asPointer</a> (<a class="el" href="structutjson.html">utjson</a> *object, char **pointer_type)</td></tr>
+<tr class="memdesc:a7248e5303c528422183c3e245aaac9d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves a pointer value and its type from a JSON object.  <a href="#a7248e5303c528422183c3e245aaac9d8">More...</a><br /></td></tr>
+<tr class="separator:a7248e5303c528422183c3e245aaac9d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5d8914f16fb642c13ce01bba4a2301e2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structutjson.html">utjson</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__functions.html#ga5d8914f16fb642c13ce01bba4a2301e2">utjson_get</a> (<a class="el" href="structutjson.html">utjson</a> *object, char *name)</td></tr>
 <tr class="memdesc:ga5d8914f16fb642c13ce01bba4a2301e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves a value from a JSON object by key.  <a href="group__functions.html#ga5d8914f16fb642c13ce01bba4a2301e2">More...</a><br /></td></tr>
 <tr class="separator:ga5d8914f16fb642c13ce01bba4a2301e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -336,7 +344,7 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">if</span> (utjson_IS(OBJECT, <span class="keywordtype">object</span>))              \</div><div class="line">    HASH_ITER(<a class="code" href="structutjson.html#a0071a5146ad41cf0d829e5f059e34248">hh</a>, *(object-&gt;children), item, tmp)</div><div class="ttc" id="structutjson_html_a0071a5146ad41cf0d829e5f059e34248"><div class="ttname"><a href="structutjson.html#a0071a5146ad41cf0d829e5f059e34248">utjson::hh</a></div><div class="ttdeci">UT_hash_handle hh</div><div class="ttdef"><b>Definition:</b> utjson.h:45</div></div>
+<b>Value:</b><div class="fragment"><div class="line"><span class="keywordflow">if</span> (utjson_IS(OBJECT, <span class="keywordtype">object</span>))              \</div><div class="line">    HASH_ITER(<a class="code" href="structutjson.html#a0071a5146ad41cf0d829e5f059e34248">hh</a>, *(object-&gt;children), item, tmp)</div><div class="ttc" id="structutjson_html_a0071a5146ad41cf0d829e5f059e34248"><div class="ttname"><a href="structutjson.html#a0071a5146ad41cf0d829e5f059e34248">utjson::hh</a></div><div class="ttdeci">UT_hash_handle hh</div><div class="ttdef"><b>Definition:</b> utjson.h:46</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -378,6 +386,8 @@ Functions</h2></td></tr>
 <tr><td class="fieldname"><a id="ga1ca98d67f62e7feb99069da91df062b0ab03438274f6ba04b923e993c1deeff0d"></a>utjson_ARRAY&#160;</td><td class="fielddoc"><p>Array of JSON values </p>
 </td></tr>
 <tr><td class="fieldname"><a id="ga1ca98d67f62e7feb99069da91df062b0a34837d65bab94365e9bb7662b434f80c"></a>utjson_OBJECT&#160;</td><td class="fielddoc"><p>JSON object with key-value pairs </p>
+</td></tr>
+<tr><td class="fieldname"><a id="ga1ca98d67f62e7feb99069da91df062b0a86fe727c05dcf62e89a2390964fca8a8"></a>utjson_POINTER&#160;</td><td class="fielddoc"><p>Universal pointer type </p>
 </td></tr>
 </table>
 
@@ -644,6 +654,46 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a7248e5303c528422183c3e245aaac9d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7248e5303c528422183c3e245aaac9d8">&#9670;&nbsp;</a></span>utjson_asPointer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* utjson_asPointer </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structutjson.html">utjson</a> *&#160;</td>
+          <td class="paramname"><em>object</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">char **&#160;</td>
+          <td class="paramname"><em>pointer_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Retrieves a pointer value and its type from a JSON object. </p>
+<dl class="section return"><dt>Returns</dt><dd>The stored pointer, or NULL if invalid.</dd></dl>
+<p>Retrieves a pointer value and its type from a JSON object.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">object</td><td>The JSON object. </td></tr>
+    <tr><td class="paramname">pointer_type</td><td>A pointer to a string where the type will be stored. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The stored pointer, or NULL if invalid. </dd></dl>
+
+</div>
+</div>
 <a id="a97375f4b12f381fd59346278de687fa8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a97375f4b12f381fd59346278de687fa8">&#9670;&nbsp;</a></span>utjson_asString()</h2>
 
@@ -769,6 +819,46 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>utjson* </dd></dl>
+
+</div>
+</div>
+<a id="a6faf82bb9a66cdd2785d919d7c5abe77"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6faf82bb9a66cdd2785d919d7c5abe77">&#9670;&nbsp;</a></span>utjson_createPointer()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structutjson.html">utjson</a>* utjson_createPointer </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates a JSON object representing a pointer. </p>
+<dl class="section return"><dt>Returns</dt><dd>A utjson object of type utjson_POINTER.</dd></dl>
+<p>Creates a JSON object representing a pointer.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ptr</td><td>The pointer to store. </td></tr>
+    <tr><td class="paramname">type</td><td>A string describing the pointer type. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A utjson object of type utjson_POINTER. </dd></dl>
 
 </div>
 </div>
