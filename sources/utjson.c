@@ -716,6 +716,12 @@ static utjson *parse_value(char **source)
     return NULL;
 }
 
+/**
+ * Parse a JSON string into utjson*
+ *
+ * @param source
+ * @return utjson*
+ */
 utjson *utjson_parse(char *source)
 {
     if (!source)
@@ -738,6 +744,13 @@ static void append_str(char **dest, const char *format, ...)
     free(temp);
 }
 
+/**
+ * Prints JSON into new string
+ *
+ * @param object
+ * @param readable
+ * @return char*
+ */
 char *utjson_print(utjson *object, bool readable)
 {
     if (!object)
@@ -791,4 +804,88 @@ char *utjson_print(utjson *object, bool readable)
         break;
     }
     return output;
+}
+
+/**
+ * Detachs an object from parent
+ *
+ * @param object
+ * @return utjson*
+ */
+utjson *utjson_detach(utjson *object)
+{
+    if (!object || !object->parent)
+        return object; // Already detached
+
+    utjson *parent = object->parent;
+    object->parent = NULL;
+
+    if (utjson_IS(ARRAY, parent))
+    {
+        // Remove from array
+        for (uint16_t i = 0; i < parent->used; i++)
+        {
+            if (parent->children[i] == object)
+            {
+                memmove(&parent->children[i], &parent->children[i + 1], (parent->used - i - 1) * sizeof(utjson *));
+                parent->used--;
+                break;
+            }
+        }
+    }
+    else if (utjson_IS(OBJECT, parent))
+    {
+        // Remove from hash table
+        HASH_DEL(*(parent->children), object);
+    }
+    return object;
+}
+
+/**
+ * Clones an object
+ *
+ * @param object
+ * @return utjson*
+ */
+utjson *utjson_clone(const utjson *object)
+{
+    if (!object)
+        return NULL;
+
+    utjson *copy = utjson_construct();
+    copy->type = object->type;
+
+    switch (object->type)
+    {
+    case utjson_BOOL:
+        // fall through
+    case utjson_NUMBER:
+        copy->number = object->number;
+        break;
+    case utjson_STRING:
+        copy->string = strdup(object->string);
+        break;
+    case utjson_ARRAY:
+        copy->allocated = object->allocated;
+        copy->used = object->used;
+        copy->children = calloc(copy->allocated, sizeof(utjson *));
+        for (uint16_t i = 0; i < object->used; i++)
+        {
+            copy->children[i] = utjson_clone(object->children[i]);
+        }
+        break;
+    case utjson_OBJECT:
+    {
+        utjson *entry, *tmp, *new_entry;
+        HASH_ITER(hh, *(object->children), entry, tmp)
+        {
+            new_entry = utjson_clone(entry);
+            HASH_ADD_KEYPTR(hh, *(copy->children), new_entry->name, strlen(new_entry->name), new_entry);
+        }
+    }
+    break;
+    default:
+        break;
+    }
+    return copy;
 }
