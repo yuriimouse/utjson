@@ -1,5 +1,5 @@
 # VERSION = 1.1.1
-VERSION=$(shell ../version_engine/version.sh | head -n 1 )
+VERSION=$(shell ./version/version.sh | head -n 1 )
 
 EXECUTABLE = test
 # # Library name

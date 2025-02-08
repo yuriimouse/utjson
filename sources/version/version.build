@@ -9,4 +9,4 @@ replaced=$( sed -i '$ c'"$newbuild" $self )
 echo $newbuild
 exit
 ##################
-0
+1
