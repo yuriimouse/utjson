@@ -86,6 +86,9 @@ utjson *utjson_addObject(utjson *target);
 utjson *utjson_parse(char *source);
 char *utjson_print(utjson *object, bool readable);
 
+utjson *utjson_detach(utjson *object);
+utjson *utjson_clone(const utjson *object);
+
 #define utjson_arrayFor(array, item, index) \
     if (utjson_IS(ARRAY, array))            \
         for (uint16_t index = 0; index < array->used && (item = array[index], 1); index++)
