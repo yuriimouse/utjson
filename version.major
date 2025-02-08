@@ -1,0 +1,10 @@
+#!/bin/bash
+##################
+major=$( tac $_ | grep -m 1 '[^[:blank:]]' )
+echo $major
+exit
+##################
+# basic major version
+2025-02-07
+1
+
