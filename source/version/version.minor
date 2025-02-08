@@ -1,0 +1,20 @@
+#!/bin/bash
+##################
+self=$_
+last=$( tac $self | grep -m 1 '[^[:blank:]]' )
+if [[ $( echo $last | grep -E "^[[:digit:]]{1,}$" ) ]]
+then
+    version=$last
+else
+    old_version=$( tac $self | grep -m 1 -E "^[[:digit:]]+$" )
+    version=$((old_version + 1))
+    incdate=$( date +%Y-%m-%d )
+    echo -e "$incdate\n$version" >> $self
+    #echo "$version" >> $self
+    build="${self//minor/build}"
+    replaced=$( sed -i '$ c0' $build ) 
+fi
+echo $version
+exit
+##################
+1
