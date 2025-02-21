@@ -5,7 +5,7 @@
  * @version 1.0
  * @date 2025
  */
-
+#include "utjson.h"
 /**
  * @mainpage UTJSON Documentation
  *
@@ -43,7 +43,8 @@
  */
 /**@{*/
 /// JSON data type enumeration.
-typedef enum {
+typedef enum
+{
     utjson_NULL,   ///< Null value
     utjson_BOOL,   ///< Boolean value (true/false)
     utjson_NUMBER, ///< Numeric value
@@ -161,4 +162,3 @@ utjson *utjson_detach(utjson *object);
 utjson *utjson_clone(const utjson *object);
 
 /**@}*/
-
