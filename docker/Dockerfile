@@ -10,8 +10,6 @@ RUN dnf install findutils -y
 RUN dnf --enablerepo=powertools install CUnit-devel -y
 # git
 RUN dnf install git -y
-# json
-RUN dnf install cjson* -y
 # valgrind
 RUN dnf install valgrind -y
 # telnet
